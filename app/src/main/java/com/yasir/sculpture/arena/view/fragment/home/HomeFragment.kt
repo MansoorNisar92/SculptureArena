@@ -71,39 +71,42 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun initObservers() {
-        viewModel.fragmentUIStateLiveData.observe(viewLifecycleOwner) { homeFragmentUiState ->
-            when (homeFragmentUiState) {
-                is LoadingState -> {
-                    _binding?.recyclerPopularPhotos?.gone()
-                    _binding?.progressPhotos?.visible()
-                }
-                is LoadingNextPageState -> {
-                    _binding?.progressPhotos?.gone()
-                    showToast(getString(R.string.loading))
-                }
-                is ContentState -> {
-                    _binding?.recyclerPopularPhotos?.visible()
-                    _binding?.progressPhotos?.gone()
-                }
-                is ErrorState -> {
-                    _binding?.progressPhotos?.gone()
-                    _binding?.nestedScrollView?.showSnack(homeFragmentUiState.message, getString(R.string.txt_retry)) {
-                        viewModel.retry()
+        viewModel.apply {
+            fragmentUIStateLiveData.observe(viewLifecycleOwner) { homeFragmentUiState ->
+                when (homeFragmentUiState) {
+                    is LoadingState -> {
+                        _binding?.recyclerPopularPhotos?.gone()
+                        _binding?.progressPhotos?.visible()
                     }
-                }
-
-                is ErrorNextPageState -> {
-                    _binding?.nestedScrollView?.showSnack(homeFragmentUiState.message, getString(R.string.txt_retry)) {
-                        viewModel.retry()
+                    is LoadingNextPageState -> {
+                        _binding?.progressPhotos?.gone()
+                        showToast(getString(R.string.loading))
                     }
-                }
-                else -> {
+                    is ContentState -> {
+                        _binding?.recyclerPopularPhotos?.visible()
+                        _binding?.progressPhotos?.gone()
+                    }
+                    is ErrorState -> {
+                        _binding?.progressPhotos?.gone()
+                        showSnack(homeFragmentUiState.message, getString(R.string.txt_retry)) {
+                            viewModel.retry()
+                        }
+                    }
 
+                    is ErrorNextPageState -> {
+                        showSnack(homeFragmentUiState.message, getString(R.string.txt_retry)) {
+                            viewModel.retry()
+                        }
+                    }
+                    else -> {
+
+                    }
                 }
             }
-        }
-        viewModel.photosResponseModelListData.observe(viewLifecycleOwner) { photos ->
-            photosListAdapter.differ.submitList(photos)
+
+            photosResponseModelListData.observe(viewLifecycleOwner) { photos ->
+                photosListAdapter.differ.submitList(photos)
+            }
         }
     }
 

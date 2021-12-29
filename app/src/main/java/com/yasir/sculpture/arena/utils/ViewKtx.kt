@@ -21,8 +21,9 @@ fun View.invisible() {
     visibility = View.INVISIBLE
 }
 
-fun View.showSnack(message: String?, action: String = "", actionListener: () -> Unit = {}): Snackbar? {
-    val snackbar = message?.let { Snackbar.make(this, it, Snackbar.LENGTH_SHORT) }
+fun Fragment.showSnack(message: String?, action: String = "",actionListener: () -> Unit = {}) :Snackbar? {
+    val snackbar = message?.let { Snackbar.make(requireView(), it, Snackbar.LENGTH_SHORT) }
+
     if (action != "") {
         snackbar?.duration = Snackbar.LENGTH_INDEFINITE
         snackbar?.setAction(action) {
@@ -32,6 +33,10 @@ fun View.showSnack(message: String?, action: String = "", actionListener: () -> 
     }
     snackbar?.show()
     return snackbar
+}
+
+fun Fragment.showSnackBar(message: String) = view?.let {
+    Snackbar.make(it,message, Snackbar.LENGTH_LONG).show()
 }
 
 fun Fragment.showToast(message: String) {
